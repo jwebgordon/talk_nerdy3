@@ -1,7 +1,8 @@
+#import everything we need
 from flask import Flask, render_template, request, redirect
 import requests
 
-
+#Create the Flask app
 app = Flask(__name__)
 
 
@@ -21,6 +22,7 @@ def form_submit():
 	pass
 
 
+#Start up the app when the app.py file is run
 if __name__ == "__main__": 
 	app.debug = True
 	app.run()
