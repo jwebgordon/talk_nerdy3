@@ -21,37 +21,37 @@ At it’s simplest, oAuth is a prescribed method and flow that allows a user to 
 Before we dive into our first tasks, let’s understand the way an oAuth flow works. There are 4 main steps to this flow.
 
 1. An app is created in a developer portal, which provides a ‘client id’ and a ‘client secret’. 
-    a. The client secret is similar to a HAPI key i.e. it should only be used locally or server side - keep it secret, keep it safe! 
-    b. You’ll build an authentication URL for your app that sends the user to HubSpot, where they will grant access using their username and password. 
-    c. This is generally just a normal <a> tag or <button> where the ‘href’ points to the service where access will be granted. Note the client_id, scope and redirect (where to go after access is granted)
-    d. Example: `<a href="https://app.hubspot.com/oauth/authorize?client_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&scope=contacts%20automation&redirect_uri=http://www.hubspot.com">Authorize me, captain!</a>`
-    e. If access granted, the user is redirected to this URL: `http://www.hubspot.com?code=xxxx`
-    f. [Read the authentication URL docs](http://developers.hubspot.com/docs/methods/oauth2/initiate-oauth-integration)
+    1. The client secret is similar to a HAPI key i.e. it should only be used locally or server side - keep it secret, keep it safe! 
+    2. You’ll build an authentication URL for your app that sends the user to HubSpot, where they will grant access using their username and password. 
+    3. This is generally just a normal <a> tag or <button> where the ‘href’ points to the service where access will be granted. Note the client_id, scope and redirect (where to go after access is granted)
+    4. Example: `<a href="https://app.hubspot.com/oauth/authorize?client_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&scope=contacts%20automation&redirect_uri=http://www.hubspot.com">Authorize me, captain!</a>`
+    5. If access granted, the user is redirected to this URL: `http://www.hubspot.com?code=xxxx`
+    6. [Read the authentication URL docs](http://developers.hubspot.com/docs/methods/oauth2/initiate-oauth-integration)
 2. Upon successful auth, the user is redirected to your app with a `code` appended to the URL. That code is exchanged along with the client secret to get an `access_token` and a `refresh_token`. 
-    a. This ‘exchange’ is done via a server-side HTTP call so that you don’t expose your client secret.
-    b. The code in the URL is accessible via the request object in Flask
-    c. [Read the docs to understand how to do this POST request exchange](http://developers.hubspot.com/docs/methods/oauth2/get-access-and-refresh-tokens)
+    1. This ‘exchange’ is done via a server-side HTTP call so that you don’t expose your client secret.
+    2. The code in the URL is accessible via the request object in Flask
+    3. [Read the docs to understand how to do this POST request exchange](http://developers.hubspot.com/docs/methods/oauth2/get-access-and-refresh-tokens)
 3. The `access_token` is used to make authenticated API calls. 
-    a. An authenticated call using oAuth 2.0 is different than oAuth 1.0. Instead of appending the token to the URL as a query parameter, all HTTP calls carry a header: `Authorization: Bearer CJSP5qf1K-this-is-a-token-qYAGQsF4`
-    b. Once that `access_token` expires (after 6 hours), use the `refresh_token` to generate a new `access_token`. The `refresh_token` was obtained in the initial `code` exchange. The refresh token is sent in another HTTP request and a new `access_token` is provided. [Read the docs about using a refresh_token](http://developers.hubspot.com/docs/methods/oauth2/get-refresh-token-information)
+    1. An authenticated call using oAuth 2.0 is different than oAuth 1.0. Instead of appending the token to the URL as a query parameter, all HTTP calls carry a header: `Authorization: Bearer CJSP5qf1K-this-is-a-token-qYAGQsF4`
+    2. Once that `access_token` expires (after 6 hours), use the `refresh_token` to generate a new `access_token`. The `refresh_token` was obtained in the initial `code` exchange. The refresh token is sent in another HTTP request and a new `access_token` is provided. [Read the docs about using a refresh_token](http://developers.hubspot.com/docs/methods/oauth2/get-refresh-token-information)
 
 ## Second, Action.
 Let's start by registering an app and installing all the things.
 ### Step 1 - Create a Developer Portal and App
 1. Create a HubSpot Developer portal if you don't already have one. 
-    a. [Sign up here](https://app.hubspot.com/developers/signup)
-    b. Or, [Login to existing account and select dev portal](https://app.hubspot.com/login/)
+    1. [Sign up here](https://app.hubspot.com/developers/signup)
+    2. Or, [Login to existing account and select dev portal](https://app.hubspot.com/login/)
 2. Create an app in your developer portal
 3. Find your `appId`, `client id`, and  `client secret` 
 4. Take a deep breath, stuff's about to get real.
 
 ### Step 2 - Initiliaze a Flask app
 1) Let's make sure we have (most) everything we need installed. 
-    a. Open up your terminal app. (OSX: either Terminal or iTerm, Windows: Command Prompt, or download [win-bash](https://sourceforge.net/projects/win-bash/files/shell-complete/latest/)). 
-    b. Find your installed version of Python with `python -V`. If 2.7, we should be good to go. Note: Windows users will likely need a fresh install of Python 2.7 from the [Python website](https://www.python.org/).
-    b. Install Flask with `pip install flask` - note: if you encounter errors, try a fresh install of Python 2.7 from the [Python website](https://www.python.org/)
-    c. Install Requests with `pip install requests`
-    d. Install Git with `brew install git`
+    1. Open up your terminal app. (OSX: either Terminal or iTerm, Windows: Command Prompt, or download [win-bash](https://sourceforge.net/projects/win-bash/files/shell-complete/latest/)). 
+    2. Find your installed version of Python with `python -V`. If 2.7, we should be good to go. Note: Windows users will likely need a fresh install of Python 2.7 from the [Python website](https://www.python.org/).
+    3. Install Flask with `pip install flask` - note: if you encounter errors, try a fresh install of Python 2.7 from the [Python website](https://www.python.org/)
+    4. Install Requests with `pip install requests`
+    5. Install Git with `brew install git`
 2) In your terminal, navigate to where you would like to build your project
         _Reminder:_
         `ls` to list files and folders in current location
@@ -74,10 +74,10 @@ To properly redirect through our flow, we need a securely hosted app (a requirem
 3. Once installed, you can use the `heroku` command from your command shell. Login w/ username and password (may be prompted at a later step)
 4. `cd` back to your local app directory
 5. Heroku uses git to determine how to build your app. It also requires 2 configuration files to tell it that it's running a Python app and swap in a production-ready server. Let's create a .gitignore file, Heroku Procfile, and runtime/requirements file. We'll then add and commit any changes to our git repo.
-    a. Create a Procfile (required by Heroku to launch a production server): `touch Procfile` and then `open Procfile`
-    b. In your Procfile, paste `web: gunicorn -w 4 -b "0.0.0.0:$PORT" app:app` This defines gunicorn as your server, which is production ready, unlike the lightweight server that's included in Flask that you've been running locally
-    c. Create a requirements.txt file, letting Heroku's pip instance know how to install your app. `touch requirements.txt` then `open requirements.txt`
-    d. Paste the following:
+    1. Create a Procfile (required by Heroku to launch a production server): `touch Procfile` and then `open Procfile`
+    2. In your Procfile, paste `web: gunicorn -w 4 -b "0.0.0.0:$PORT" app:app` This defines gunicorn as your server, which is production ready, unlike the lightweight server that's included in Flask that you've been running locally
+    3. Create a requirements.txt file, letting Heroku's pip instance know how to install your app. `touch requirements.txt` then `open requirements.txt`
+    4. Paste the following:
 ```Flask==0.12.0
 Jinja2==2.8.1
 Werkzeug==0.8.3
@@ -89,9 +89,9 @@ wheel==0.24.0
 httplib2==0.9.1
 ```
 6. Next, create a .gitignore file to leave git files out of your build process (they're detritus, not worthy of being included): `touch .gitignore` then `open .gitignore`
-    a. Copy and save the contents of this [common .gitignore file](https://gist.github.com/octocat/9257657) and save and close
-    b. Add/stage all the files in your local repo with `git add *` 
-    c. Then commit (i.e. save the version) with `git commit -m "include a short informative message about the commit"`
+    1. Copy and save the contents of this [common .gitignore file](https://gist.github.com/octocat/9257657) and save and close
+    2. Add/stage all the files in your local repo with `git add *` 
+    3. Then commit (i.e. save the version) with `git commit -m "include a short informative message about the commit"`
 6. Now we're ready for an initial deployment to Heroku. Create an app on Heroku, which prepares Heroku to receive your source code: `heroku create`
 7. Deploy your app to Heroku using  `git push heroku master`
 8. The application is now deployed. Your app will have a URL structure like `https://funny-named-number.herokuapp.com`. You will use this as the root of your redirect URL in your oAuth flow.
@@ -111,14 +111,14 @@ httplib2==0.9.1
 ## You're a master of karate and friendship for everyone
 ### Step 6- Choose Your Own Adventure
 1. Have the user enter an email address in a custom form and after submission, return the Contacts API data to the front end *easier adventure*
-    a. A general outline could include...
-    b. Build a new template that has a form
-    c. Store the access token as a cookie by using Flasks `session` module (or, just have a form where you can manually enter it, then use it on the backend)
-    d. On submission, use the access token in your cookie and email address in form to make a Contacts request
-    e. Return the Contacts data to the template as data to render.
+    1. A general outline could include...
+    2. Build a new template that has a form
+    3. Store the access token as a cookie by using Flasks `session` module (or, just have a form where you can manually enter it, then use it on the backend)
+    4. On submission, use the access token in your cookie and email address in form to make a Contacts request
+    5. Return the Contacts data to the template as data to render.
 2. Create a Timeline API integration.
-    a. Create your types
-    b. Make a call that tags an event to a contact.
+    1. Create your types
+    2. Make a call that tags an event to a contact.
 
 
 
