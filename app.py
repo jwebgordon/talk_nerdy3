@@ -14,7 +14,7 @@ def index():
 
 
 #Add in the URL path for your form action
-@app.route("YOUR FORM ROUTE HERE",methods=["GET","POST"])
+@app.route("/yourFormRouteHere",methods=["GET","POST"])
 def form_submit():
 	#replace 'pass' with the code for your form submission handler
 	#check out the 'request' and 'render_template' documentation
